@@ -1,0 +1,25 @@
+{
+  "name": "molsvg",
+  "version": "1.0.0",
+  "description": "Render chemical molecules in mol and sdf files as svg using D3.",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "chemistry",
+    "molecules",
+    "sdf",
+    "d3"
+  ],
+  "author": "Ahmed Mohamed",
+  "license": "MIT",
+  "devDependencies": {
+    "grunt": "^1.0.1",
+    "bowser": "^1.0.0",
+    "grunt-contrib-cssmin": "^1.0.2",
+    "grunt-contrib-jshint": "^1.0.0",
+    "grunt-contrib-uglify": "^2.0.0",
+    "jshint-stylish": "^2.2.1"
+  }
+}
