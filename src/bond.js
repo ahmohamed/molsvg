@@ -21,7 +21,7 @@ module.exports = function () {
     // apply backing by calculating the unit vector and
     // subsequent scaling: shortens the drawn bond
     // don't shorten bonds if no symbols are drawn.
-    var shorten = no_symbols ? 0.0 : 0.2; 
+    var shorten = no_symbols ? 0.0 : 0.0; 
     var dox = a2.x - a1.x,
         doy = a2.y - a1.y,
         l = Math.sqrt(dox * dox + doy * doy),
@@ -52,8 +52,12 @@ module.exports = function () {
     } else if (bond.order === 3) { // triple bond
       draw_triple(graph, x1, x2, y1, y2, l);
     }
+    draw_highligh_rect(graph, x1, x2, y1, y2, _length);
   }
   
+  _render.bondLength = function () {
+    return _length;
+  };  
   _render.bond = function (_) {
     if (!arguments.length) {
       return bond;
@@ -95,6 +99,7 @@ module.exports = function () {
     return _render;
   };
 
+  
   function draw_plain(graph, xyData) {
     graph.append('svg:path')
       .attr('d', plainBond(xyData))
@@ -223,7 +228,24 @@ module.exports = function () {
     ];
     draw_plain(graph, xyData);
   }
-
+  function draw_highligh_rect(graph, x1, x2, y1, y2, l) {
+    x1 = x(x1);
+    x2 = x(x2);
+    y1 = y(y1);
+    y2 = y(y2);
+    
+    graph.insert("line")
+      .attr("class", "highlight-bond")
+      .attr("x1", x1)
+      .attr("y1", y1)
+      .attr("x2", x2)
+      .attr("y2", y2)
+      .style("stroke", "#a8d1ff")
+      .style("stroke-width", Math.max(l/3, 10) + "px")
+      .style("stroke-opacity", "0.0")
+      .attr('stroke-linecap', 'round')
+      .attr('stroke-linejoin', 'round');
+  }
 /**
  * d3 line function using the SVG path mini language to draw a plain bond.
  */

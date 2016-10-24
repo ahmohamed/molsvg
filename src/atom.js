@@ -42,17 +42,18 @@ module.exports = function () {
       .attr('transform', 'translate(' + 
         x(atom.x) + ',' + y(atom.y) + ')');
     
-    if (no_symbols) {
-      no_symbol_circle(g);
-    }else{
-      symbol_ellipse(g);
-      if(!hidden){
+    if(!hidden){
+      if (no_symbols) {
+        no_symbol_circle(g);
+      }else{
+        symbol_ellipse(g);
         symbol_text(g);
       }
-      
     }
-  
-
+    
+    var corner = Math.ceil(avgL / 6);
+    if (no_symbols){ corner /= 2; }
+    
     if (atom.charge !== 0) {
         var c = atom.charge;
         if (c < 0) {
@@ -60,28 +61,30 @@ module.exports = function () {
         } else {
             c = (c === +1) ? '+' : (c + '+');
         }
+        
         g.append('text')
-            .attr('dx', +1 * Math.ceil(avgL / 3))
-            .attr('dy', -1 * Math.ceil(avgL / 4.5))
+            .attr('dx', corner)
+            .attr('dy', -corner)
             .attr('text-anchor', 'left')
             .attr('font-family', 'sans-serif')
             // hack: magic number for scaling (half of symbol size)
             .attr('fill', atomCol)
-            .attr('font-size', Math.ceil(avgL / 3)) 
+            .attr('font-size', Math.ceil(avgL / 1.5)) 
             .text(c);
     }
 
     if (atom.mass !== 0) {
         g.append('text')
-            .attr('dx', -2 * Math.ceil(avgL / 3))
-            .attr('dy', -1 * Math.ceil(avgL / 4.5))
+            .attr('dx', -2 * corner)
+            .attr('dy', -corner)
             .attr('text-anchor', 'left')
             .attr('font-family', 'sans-serif')
             // hack: magic number for scaling (half of symbol size)
-            .attr('font-size', Math.ceil(avgL / 3)) 
+            .attr('font-size', Math.ceil(avgL / 1.5)) 
             .attr('fill', atomCol)
             .text(atom.mass);
     }
+    highlight_circle(g);
     
     return g;
   }
@@ -112,9 +115,9 @@ module.exports = function () {
   };
   _render.hidden = function (_) {
     if (!arguments.length) {
-      return show_placeholder;
+      return hidden;
     }
-    show_placeholder = _;
+    hidden = _;
     
     return _render;
   };
@@ -149,6 +152,19 @@ module.exports = function () {
       .attr('y', -r / 2)
       .attr('fill', atomCol)
       .attr('opacity', '1');
+  
+    return circle;  
+  }
+  function highlight_circle(g) {
+    // hack: magic number for scaling
+    var r = Math.ceil(avgL / 3);
+    var circle = g.append('svg:circle')
+      .attr('class', 'highlight-atom')
+      .attr('r', r)
+      .attr('x', -r / 2)
+      .attr('y', -r / 2)
+      .attr('fill', atomCol)
+      .attr('fill-opacity', '0.0');
   
     return circle;  
   }

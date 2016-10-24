@@ -1,6 +1,6 @@
 # molsvg: render MDL mol & sdf files as svg
 
-molsvg is javascript library 
+molsvg is javascript library to draw chemical molecules from Mol and SDF files as SVG. molsvg uses D3 style for creating svg elements from data. User interactivity is enabled through highlight ir select event handling.
 
 ### Usage
 

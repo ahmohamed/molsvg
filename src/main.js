@@ -21,6 +21,7 @@
 */
 module.exports = function () {
   var molfile, x, y, filtered_atoms = [], organic, implicit_h;
+  var _highlight = true;
   
   var graph = require('./graph')();
   var draw_atom = require('./atom')();
@@ -47,32 +48,40 @@ module.exports = function () {
     draw_bond = draw_bond.atoms(atoms)
       .x(x).y(y);
     
-    console.log("implicit", implicit_h);
+    var bondL = [];
     bonds.filter(function (b) {
       return filtered_atoms.indexOf( atoms[b.a1].symbol ) < 0 &&
         filtered_atoms.indexOf( atoms[b.a2].symbol ) < 0;
     }).forEach(function (b) {
       graph.el()    
         .call(draw_bond.bond(b));
+      
+      bondL.push(draw_bond.bondLength());
     });
+    var avgBondL = average(bondL);
+    if (!draw_bond.noSymbols()){avgBondL *= 0.8;}
     
-    if (organic){
-      filtered_atoms.push('C');
-    }
-    
-    draw_atom = draw_atom.bondLength(21)
+    draw_atom = draw_atom.bondLength(avgBondL)
       .x(x).y(y);
     
     atoms.filter(function (a) {
       return filtered_atoms.indexOf(a.symbol) < 0;
     })
     .forEach(function (a) {
-      graph.el()    
-        .call(draw_atom.atom(a));
+      graph.el()
+        .call(
+          draw_atom.atom(a)
+            .hidden(organic && a.symbol === 'C')
+        );
     });
-    console.log("rendered");
+    
+    
+    if (_highlight) {
+      enable_highlight(graph.el());
+    }
+    
   }
-  
+  // Input File
   _main.molfile = function (_) {
     if (!arguments.length) {
       return molfile;
@@ -81,7 +90,8 @@ module.exports = function () {
     
     return _main;
   };
-
+  
+  /******** Rendering config ************/
   _main.implicitH = function (_) {
     if (!arguments.length) {
       return implicit_h;
@@ -118,6 +128,22 @@ module.exports = function () {
     
     return _main;
   };
+  /**************************************/
+  /******** User interaction ************/
+  _main.highlightEnable = function (_) {
+    if (!arguments.length) {
+      return _highlight;
+    }
+    if (_ && graph.el()){ // molecule is rendered.
+      enable_highlight(graph.el());      
+    }
+    _highlight = _;
+    
+    return _main;
+  };
+  
+  /**************************************/
+  /******** SVG attributes **************/  
   _main.width = graph.width;
   _main.height = graph.height;
   
@@ -127,4 +153,26 @@ module.exports = function () {
     return filtered_atoms.indexOf(b.a1.symbol) < 0 &&
       filtered_atoms.indexOf(b.a2.symbol) < 0;
   }
+};
+
+var average = function(arr){
+  var sum = 0;
+  for (var i = 0; i < arr.length; i++) {
+    sum += arr[i];
+  }
+  return sum / arr.length;
+};
+
+var enable_highlight = function (graph_el) {
+  graph_el.selectAll('.highlight-bond').on('mouseenter', function () {
+    d3.select(this).style("stroke-opacity", "0.5");
+  }).on('mouseleave', function () {
+    d3.select(this).style("stroke-opacity", "0.0");
+  });
+  
+  graph_el.selectAll('.highlight-atom').on('mouseenter', function () {
+    d3.select(this).style("stroke", "#a8d1ff").style("stroke-width", "2px");
+  }).on('mouseleave', function () {
+    d3.select(this).attr("stroke", "#fff").style("stroke-width", "0px");
+  });
 };

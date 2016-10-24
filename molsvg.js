@@ -43,17 +43,18 @@ module.exports = function () {
       .attr('transform', 'translate(' + 
         x(atom.x) + ',' + y(atom.y) + ')');
     
-    if (no_symbols) {
-      no_symbol_circle(g);
-    }else{
-      symbol_ellipse(g);
-      if(!hidden){
+    if(!hidden){
+      if (no_symbols) {
+        no_symbol_circle(g);
+      }else{
+        symbol_ellipse(g);
         symbol_text(g);
       }
-      
     }
-  
-
+    
+    var corner = Math.ceil(avgL / 6);
+    if (no_symbols){ corner /= 2; }
+    
     if (atom.charge !== 0) {
         var c = atom.charge;
         if (c < 0) {
@@ -61,28 +62,30 @@ module.exports = function () {
         } else {
             c = (c === +1) ? '+' : (c + '+');
         }
+        
         g.append('text')
-            .attr('dx', +1 * Math.ceil(avgL / 3))
-            .attr('dy', -1 * Math.ceil(avgL / 4.5))
+            .attr('dx', corner)
+            .attr('dy', -corner)
             .attr('text-anchor', 'left')
             .attr('font-family', 'sans-serif')
             // hack: magic number for scaling (half of symbol size)
             .attr('fill', atomCol)
-            .attr('font-size', Math.ceil(avgL / 3)) 
+            .attr('font-size', Math.ceil(avgL / 1.5)) 
             .text(c);
     }
 
     if (atom.mass !== 0) {
         g.append('text')
-            .attr('dx', -2 * Math.ceil(avgL / 3))
-            .attr('dy', -1 * Math.ceil(avgL / 4.5))
+            .attr('dx', -2 * corner)
+            .attr('dy', -corner)
             .attr('text-anchor', 'left')
             .attr('font-family', 'sans-serif')
             // hack: magic number for scaling (half of symbol size)
-            .attr('font-size', Math.ceil(avgL / 3)) 
+            .attr('font-size', Math.ceil(avgL / 1.5)) 
             .attr('fill', atomCol)
             .text(atom.mass);
     }
+    highlight_circle(g);
     
     return g;
   }
@@ -113,9 +116,9 @@ module.exports = function () {
   };
   _render.hidden = function (_) {
     if (!arguments.length) {
-      return show_placeholder;
+      return hidden;
     }
-    show_placeholder = _;
+    hidden = _;
     
     return _render;
   };
@@ -150,6 +153,19 @@ module.exports = function () {
       .attr('y', -r / 2)
       .attr('fill', atomCol)
       .attr('opacity', '1');
+  
+    return circle;  
+  }
+  function highlight_circle(g) {
+    // hack: magic number for scaling
+    var r = Math.ceil(avgL / 3);
+    var circle = g.append('svg:circle')
+      .attr('class', 'highlight-atom')
+      .attr('r', r)
+      .attr('x', -r / 2)
+      .attr('y', -r / 2)
+      .attr('fill', atomCol)
+      .attr('fill-opacity', '0.0');
   
     return circle;  
   }
@@ -210,7 +226,7 @@ module.exports = function () {
     // apply backing by calculating the unit vector and
     // subsequent scaling: shortens the drawn bond
     // don't shorten bonds if no symbols are drawn.
-    var shorten = no_symbols ? 0.0 : 0.2; 
+    var shorten = no_symbols ? 0.0 : 0.0; 
     var dox = a2.x - a1.x,
         doy = a2.y - a1.y,
         l = Math.sqrt(dox * dox + doy * doy),
@@ -241,8 +257,12 @@ module.exports = function () {
     } else if (bond.order === 3) { // triple bond
       draw_triple(graph, x1, x2, y1, y2, l);
     }
+    draw_highligh_rect(graph, x1, x2, y1, y2, _length);
   }
   
+  _render.bondLength = function () {
+    return _length;
+  };  
   _render.bond = function (_) {
     if (!arguments.length) {
       return bond;
@@ -284,6 +304,7 @@ module.exports = function () {
     return _render;
   };
 
+  
   function draw_plain(graph, xyData) {
     graph.append('svg:path')
       .attr('d', plainBond(xyData))
@@ -412,7 +433,24 @@ module.exports = function () {
     ];
     draw_plain(graph, xyData);
   }
-
+  function draw_highligh_rect(graph, x1, x2, y1, y2, l) {
+    x1 = x(x1);
+    x2 = x(x2);
+    y1 = y(y1);
+    y2 = y(y2);
+    
+    graph.insert("line")
+      .attr("class", "highlight-bond")
+      .attr("x1", x1)
+      .attr("y1", y1)
+      .attr("x2", x2)
+      .attr("y2", y2)
+      .style("stroke", "#a8d1ff")
+      .style("stroke-width", Math.max(l/3, 10) + "px")
+      .style("stroke-opacity", "0.0")
+      .attr('stroke-linecap', 'round')
+      .attr('stroke-linejoin', 'round');
+  }
 /**
  * d3 line function using the SVG path mini language to draw a plain bond.
  */
@@ -495,7 +533,7 @@ var plainBond = d3.svg.line()
  */
 module.exports = function () {
   var atoms, x, y, graph_el, no_margins;
-  var w = 200, h = 200;
+  var w = 500, h = 500;
   
   function graph(el) {
     // x minimum and maximum
@@ -600,6 +638,7 @@ module.exports = function () {
 */
 module.exports = function () {
   var molfile, x, y, filtered_atoms = [], organic, implicit_h;
+  var _highlight = true;
   
   var graph = require('./graph')();
   var draw_atom = require('./atom')();
@@ -626,32 +665,40 @@ module.exports = function () {
     draw_bond = draw_bond.atoms(atoms)
       .x(x).y(y);
     
-    console.log("implicit", implicit_h);
+    var bondL = [];
     bonds.filter(function (b) {
       return filtered_atoms.indexOf( atoms[b.a1].symbol ) < 0 &&
         filtered_atoms.indexOf( atoms[b.a2].symbol ) < 0;
     }).forEach(function (b) {
       graph.el()    
         .call(draw_bond.bond(b));
+      
+      bondL.push(draw_bond.bondLength());
     });
+    var avgBondL = average(bondL);
+    if (!draw_bond.noSymbols()){avgBondL *= 0.8;}
     
-    if (organic){
-      filtered_atoms.push('C');
-    }
-    
-    draw_atom = draw_atom.bondLength(21)
+    draw_atom = draw_atom.bondLength(avgBondL)
       .x(x).y(y);
     
     atoms.filter(function (a) {
       return filtered_atoms.indexOf(a.symbol) < 0;
     })
     .forEach(function (a) {
-      graph.el()    
-        .call(draw_atom.atom(a));
+      graph.el()
+        .call(
+          draw_atom.atom(a)
+            .hidden(organic && a.symbol === 'C')
+        );
     });
-    console.log("rendered");
+    
+    
+    if (_highlight) {
+      enable_highlight(graph.el());
+    }
+    
   }
-  
+  // Input File
   _main.molfile = function (_) {
     if (!arguments.length) {
       return molfile;
@@ -660,7 +707,8 @@ module.exports = function () {
     
     return _main;
   };
-
+  
+  /******** Rendering config ************/
   _main.implicitH = function (_) {
     if (!arguments.length) {
       return implicit_h;
@@ -697,6 +745,22 @@ module.exports = function () {
     
     return _main;
   };
+  /**************************************/
+  /******** User interaction ************/
+  _main.highlightEnable = function (_) {
+    if (!arguments.length) {
+      return _highlight;
+    }
+    if (_ && graph.el()){ // molecule is rendered.
+      enable_highlight(graph.el());      
+    }
+    _highlight = _;
+    
+    return _main;
+  };
+  
+  /**************************************/
+  /******** SVG attributes **************/  
   _main.width = graph.width;
   _main.height = graph.height;
   
@@ -706,6 +770,28 @@ module.exports = function () {
     return filtered_atoms.indexOf(b.a1.symbol) < 0 &&
       filtered_atoms.indexOf(b.a2.symbol) < 0;
   }
+};
+
+var average = function(arr){
+  var sum = 0;
+  for (var i = 0; i < arr.length; i++) {
+    sum += arr[i];
+  }
+  return sum / arr.length;
+};
+
+var enable_highlight = function (graph_el) {
+  graph_el.selectAll('.highlight-bond').on('mouseenter', function () {
+    d3.select(this).style("stroke-opacity", "0.5");
+  }).on('mouseleave', function () {
+    d3.select(this).style("stroke-opacity", "0.0");
+  });
+  
+  graph_el.selectAll('.highlight-atom').on('mouseenter', function () {
+    d3.select(this).style("stroke", "#a8d1ff").style("stroke-width", "2px");
+  }).on('mouseleave', function () {
+    d3.select(this).attr("stroke", "#fff").style("stroke-width", "0px");
+  });
 };
 },{"./atom":1,"./bond":2,"./graph":3,"./parser":5}],5:[function(require,module,exports){
 /**
