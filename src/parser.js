@@ -9,14 +9,15 @@ var atomBlock = function (lines, nAtoms) {
     var atoms = [];
     var offset = 4; // the first three lines belong to the header block
     for (var i = offset; i < nAtoms + offset; i++) {
-        var atom = lines[i].match(/-*\d+\.\d+|\w+/g);
-        atoms.push({
-            x: parseFloat(atom[0]),
-            y: parseFloat(atom[1]),
-            symbol: atom[3],
-            mass: 0,    // deprecated
-            charge: 0   // deprecated
-        });
+      var atom = lines[i].match(/-*\d+\.\d+|\w+/g);
+      atoms.push({
+        idx: i-offset,
+        x: parseFloat(atom[0]),
+        y: parseFloat(atom[1]),
+        symbol: atom[3],
+        mass: 0,    // deprecated
+        charge: 0   // deprecated
+      });
     }
     return atoms;
 };
@@ -33,16 +34,17 @@ var bondBlock = function (lines, nAtoms, nBonds) {
     var bonds = [];
     var offset = 4; // the first three lines belong to the header block
     for (var j = nAtoms + offset; j < nAtoms + nBonds + offset; j++) {
-        var bond = lines[j].match(/\d+/g);
-        bonds.push({
-            // adjust to '0', atom counter starts at '1'
-            a1: parseInt(bond[0]) - 1,  
-            a2: parseInt(bond[1]) - 1,
-            // values 1, 2, 3
-            order: parseInt(bond[2]),
-            // values 0 (plain),1 (wedge),4 (wiggly),6 (hash)                
-            stereo: parseInt(bond[3])
-        });
+      var bond = lines[j].match(/\d+/g);
+      bonds.push({
+        idx: j - (nAtoms+offset),
+        // adjust to '0', atom counter starts at '1'
+        a1: parseInt(bond[0]) - 1,  
+        a2: parseInt(bond[1]) - 1,
+        // values 1, 2, 3
+        order: parseInt(bond[2]),
+        // values 0 (plain),1 (wedge),4 (wiggly),6 (hash)                
+        stereo: parseInt(bond[3])
+      });
     }
     return bonds;
 };
