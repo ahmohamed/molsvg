@@ -240,11 +240,11 @@ module.exports = function () {
       .attr("y1", y1)
       .attr("x2", x2)
       .attr("y2", y2)
-      .style("stroke", "#a8d1ff")
-      .style("stroke-width", Math.max(l/3, 10) + "px")
-      .style("stroke-opacity", "0.0")
-      .attr('stroke-linecap', 'round')
-      .attr('stroke-linejoin', 'round');
+      //.style("stroke", "#a8d1ff")
+    .style("stroke-width", Math.max(l/3, 10) + "px");
+      //.style("stroke-opacity", "0.0")
+      //.attr('stroke-linecap', 'round')
+      //.attr('stroke-linejoin', 'round');
   }
 /**
  * d3 line function using the SVG path mini language to draw a plain bond.

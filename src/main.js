@@ -165,14 +165,14 @@ var average = function(arr){
 
 var enable_highlight = function (graph_el) {
   graph_el.selectAll('.highlight-bond').on('mouseenter', function () {
-    d3.select(this).style("stroke-opacity", "0.5");
+    d3.select(this).classed("highlighted", true);
   }).on('mouseleave', function () {
-    d3.select(this).style("stroke-opacity", "0.0");
+    d3.select(this).classed("highlighted", false);
   });
   
   graph_el.selectAll('.highlight-atom').on('mouseenter', function () {
-    d3.select(this).style("stroke", "#a8d1ff").style("stroke-width", "2px");
+    d3.select(this).classed("highlighted", true);
   }).on('mouseleave', function () {
-    d3.select(this).attr("stroke", "#fff").style("stroke-width", "0px");
+    d3.select(this).classed("highlighted", false);
   });
 };

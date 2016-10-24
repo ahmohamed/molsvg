@@ -445,11 +445,11 @@ module.exports = function () {
       .attr("y1", y1)
       .attr("x2", x2)
       .attr("y2", y2)
-      .style("stroke", "#a8d1ff")
-      .style("stroke-width", Math.max(l/3, 10) + "px")
-      .style("stroke-opacity", "0.0")
-      .attr('stroke-linecap', 'round')
-      .attr('stroke-linejoin', 'round');
+      //.style("stroke", "#a8d1ff")
+    .style("stroke-width", Math.max(l/3, 10) + "px");
+      //.style("stroke-opacity", "0.0")
+      //.attr('stroke-linecap', 'round')
+      //.attr('stroke-linejoin', 'round');
   }
 /**
  * d3 line function using the SVG path mini language to draw a plain bond.
@@ -782,15 +782,15 @@ var average = function(arr){
 
 var enable_highlight = function (graph_el) {
   graph_el.selectAll('.highlight-bond').on('mouseenter', function () {
-    d3.select(this).style("stroke-opacity", "0.5");
+    d3.select(this).classed("highlighted", true);
   }).on('mouseleave', function () {
-    d3.select(this).style("stroke-opacity", "0.0");
+    d3.select(this).classed("highlighted", false);
   });
   
   graph_el.selectAll('.highlight-atom').on('mouseenter', function () {
-    d3.select(this).style("stroke", "#a8d1ff").style("stroke-width", "2px");
+    d3.select(this).classed("highlighted", true);
   }).on('mouseleave', function () {
-    d3.select(this).attr("stroke", "#fff").style("stroke-width", "0px");
+    d3.select(this).classed("highlighted", false);
   });
 };
 },{"./atom":1,"./bond":2,"./graph":3,"./parser":5}],5:[function(require,module,exports){
