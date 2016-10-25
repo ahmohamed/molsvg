@@ -15,14 +15,14 @@ module.exports = function () {
       // Check if the bond order and stereo matches.
       if ( symbols && symbols.indexOf(a.symbol) < 0){
         if (adjacent) {
-          var adjacent_atoms = get_adjacent_atoms(a.idx).map(function (idx) {
+          var adjacent_atoms = get_adjacent_atoms(a).map(function (idx) {
             return atoms[idx];
           }).filter(function (adj_a) {
             return symbols.indexOf( adj_a.symbol) > -1;
-          });
-        
+          }).map(function(adj_a){return adj_a.idx;});
+          
           if (adjacent_atoms.length > 0){
-            graph_el.selectAll('.highlight-atom')
+            var filtered = graph_el.selectAll('.highlight-atom')
               .filter(function(d){ return adjacent_atoms.indexOf(d.idx) > -1; })
               .classed('highlighted', true);
           }
@@ -69,10 +69,12 @@ module.exports = function () {
     });
   };
   var get_adjacent_atoms = function (a) {
-    return bonds.map(function (b) {
+    var adj = bonds.map(function (b) {
       if (b.a1 == a.idx){ return b.a2; }
       if (b.a2 == a.idx){ return b.a1; }
     }).filter(function(e){ return e !== undefined; });
+    
+    return adj;
   };
   
   function _events(el) {
