@@ -30,11 +30,7 @@ module.exports = function () {
       // Check if the bond order and stereo matches.
       if ( symbols && symbols.indexOf(a.symbol) < 0){
         if (adjacent) {
-          var adjacent_atoms = get_adjacent_atoms(a).map(function (idx) {
-            return atoms[idx];
-          }).filter(function (adj_a) {
-            return symbols.indexOf( adj_a.symbol) > -1;
-          }).map(function(adj_a){return adj_a.idx;});
+          var adjacent_atoms = get_adjacent_atoms(a, symbols);
           
           if (adjacent_atoms.length > 0){          
             d3.select(this).classed('highlighted', true);
@@ -119,11 +115,21 @@ module.exports = function () {
       
     });
   };
-  var get_adjacent_atoms = function (a) {
+  var get_adjacent_atoms = function (a, symbols) {
+    if (symbols && symbols.constructor !== Array){
+      symbols = [symbols];
+    }
+    
     var adj = bonds.map(function (b) {
       if (b.a1 == a.idx){ return b.a2; }
       if (b.a2 == a.idx){ return b.a1; }
     }).filter(function(e){ return e !== undefined; });
+    
+    if (symbols) {
+      adj = adj.filter(function (adj_a) {
+        return symbols.indexOf( atoms[adj_a].symbol ) > -1;
+      });
+    }
     
     return adj;
   };
@@ -213,7 +219,7 @@ module.exports = function () {
   };
   /**************************************/
   
-  /******** State control ************/
+  /******** State control ***************/
   _events.hightlightAtom = function(atom_idx){
     if (!rendered){ return; }
     highligh_atom(atom_idx);
@@ -222,5 +228,6 @@ module.exports = function () {
     if (!rendered){ return; }
     highligh_bond(bond_idx);
   };
+  /**************************************/
   return _events;
 };
