@@ -228,6 +228,37 @@ module.exports = function () {
     if (!rendered){ return; }
     highligh_bond(bond_idx);
   };
+  _events.getSelectedAtoms = function (symbols) {
+    if (!rendered){ return; }
+    var out = rendered.selectAll('.highlight-atom.selected').data();
+    if (symbols && symbols.constructor !== Array){
+      symbols = [symbols];
+    }
+    if (symbols) {
+      out.filter(function (a) { return symbols.indexOf(a.symbol) > -1;});
+    }
+    return out;
+  };
+  _events.getHighlightedAtoms = function (symbols) {
+    if (!rendered){ return; }
+    var out = rendered.selectAll('.highlight-atom.highlighted').data();
+    if (symbols && symbols.constructor !== Array){
+      symbols = [symbols];
+    }
+    if (symbols) {
+      out.filter(function (a) { return symbols.indexOf(a.symbol) > -1;});
+    }
+    return out;
+  };
+  _events.getSelectedBonds = function () {
+    if (!rendered){ return; }
+    return rendered.selectAll('.highlight-bond.selected').data();
+  };
+  _events.getHighlightedBonds = function () {
+    if (!rendered){ return; }
+    return rendered.selectAll('.highlight-bond.highlighted').data();
+  };
+  
   /**************************************/
   return _events;
 };

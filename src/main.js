@@ -66,6 +66,14 @@ module.exports = function () {
   _main.selectEnable = functor(events.selectEnable);
   /**************************************/
   
+  /******** State control ***************/
+  _main.hightlightAtom = _events.hightlightAtom;
+  _main.hightlightBond = _events.hightlightBond;
+  _main.getSelectedAtoms = _events.getSelectedAtoms;
+  _main.getHighlightedAtoms = _events.getHighlightedAtoms;
+  _main.getSelectedBonds = _events.getSelectedBonds;
+  /**************************************/
+  
   /******** SVG attributes **************/  
   _main.width = functor(renderer.width);
   _main.height = functor(renderer.height);
