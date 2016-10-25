@@ -246,7 +246,7 @@ module.exports = function () {
       //.style('stroke-opacity', '0.0')
       //.attr('stroke-linecap', 'round')
       //.attr('stroke-linejoin', 'round');
-z  }
+  }
   /**
    * d3 line function using the SVG path mini language to draw a plain bond.
    */
