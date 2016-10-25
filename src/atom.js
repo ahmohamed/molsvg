@@ -55,34 +55,34 @@ module.exports = function () {
     if (no_symbols){ corner /= 2; }
     
     if (atom.charge !== 0) {
-        var c = atom.charge;
-        if (c < 0) {
-            c = (c === -1) ? '-' : (c + '-');
-        } else {
-            c = (c === +1) ? '+' : (c + '+');
-        }
-        
-        g.append('text')
-            .attr('dx', corner)
-            .attr('dy', -corner)
-            .attr('text-anchor', 'left')
-            .attr('font-family', 'sans-serif')
-            // hack: magic number for scaling (half of symbol size)
-            .attr('fill', atomCol)
-            .attr('font-size', Math.ceil(avgL / 1.5)) 
-            .text(c);
+      var c = atom.charge;
+      if (c < 0) {
+        c = (c === -1) ? '-' : (c + '-');
+      } else {
+        c = (c === +1) ? '+' : (c + '+');
+      }
+      
+      g.append('text')
+        .attr('dx', corner)
+        .attr('dy', -corner)
+        .attr('text-anchor', 'left')
+        .attr('font-family', 'sans-serif')
+        // hack: magic number for scaling (half of symbol size)
+        .attr('fill', atomCol)
+        .attr('font-size', Math.ceil(avgL / 1.5)) 
+        .text(c);
     }
 
     if (atom.mass !== 0) {
-        g.append('text')
-            .attr('dx', -2 * corner)
-            .attr('dy', -corner)
-            .attr('text-anchor', 'left')
-            .attr('font-family', 'sans-serif')
-            // hack: magic number for scaling (half of symbol size)
-            .attr('font-size', Math.ceil(avgL / 1.5)) 
-            .attr('fill', atomCol)
-            .text(atom.mass);
+      g.append('text')
+        .attr('dx', -2 * corner)
+        .attr('dy', -corner)
+        .attr('text-anchor', 'left')
+        .attr('font-family', 'sans-serif')
+        // hack: magic number for scaling (half of symbol size)
+        .attr('font-size', Math.ceil(avgL / 1.5)) 
+        .attr('fill', atomCol)
+        .text(atom.mass);
     }
     highlight_circle(g);
     

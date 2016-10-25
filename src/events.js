@@ -27,19 +27,19 @@ module.exports = function () {
       var $this = d3.select(this);
       var a = $this.datum();
     
-      // Check if the bond order and stereo matches.
+      // Check if the atom symbol matches.
       if ( symbols && symbols.indexOf(a.symbol) < 0){
+        // Atom symbol does not match. Check adjacent atoms if allowed.
         if (adjacent) {
           var adjacent_atoms = get_adjacent_atoms(a, symbols);
-          
           if (adjacent_atoms.length > 0){          
             d3.select(this).classed('highlighted', true);
             highligh_atom(adjacent_atoms);
           }
         }
-      
         return;
       }
+      
       d3.select(this).classed('highlighted', true);
     }).on('mouseleave', function () {
       graph_el.selectAll('.highlight-atom.highlighted').classed('highlighted', false);
