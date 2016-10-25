@@ -67,11 +67,11 @@ module.exports = function () {
   /**************************************/
   
   /******** State control ***************/
-  _main.hightlightAtom = _events.hightlightAtom;
-  _main.hightlightBond = _events.hightlightBond;
-  _main.getSelectedAtoms = _events.getSelectedAtoms;
-  _main.getHighlightedAtoms = _events.getHighlightedAtoms;
-  _main.getSelectedBonds = _events.getSelectedBonds;
+  _main.hightlightAtom = events.hightlightAtom;
+  _main.hightlightBond = events.hightlightBond;
+  _main.getSelectedAtoms = events.getSelectedAtoms;
+  _main.getHighlightedAtoms = events.getHighlightedAtoms;
+  _main.getSelectedBonds = events.getSelectedBonds;
   /**************************************/
   
   /******** SVG attributes **************/  
