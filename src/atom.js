@@ -33,12 +33,12 @@ var atomColor = {
 };
 
 module.exports = function () {
-  var atom, g_el, no_symbols, hidden, atomCol, avgL, x, y;
+  var atom, no_symbols, hidden, atomCol, avgL, x, y;
 
   function _render(el) {
     atomCol = d3.rgb(atomColor[atom.symbol[0]]);
     var g = el.append('svg:g')
-      .attr("class", "atom atom-" + atom.symbol)
+      .attr('class', 'atom atom-' + atom.symbol)
       .attr('transform', 'translate(' + 
         x(atom.x) + ',' + y(atom.y) + ')');
     
@@ -159,6 +159,7 @@ module.exports = function () {
     // hack: magic number for scaling
     var r = Math.ceil(avgL / 3);
     var circle = g.append('svg:circle')
+      .datum(atom)
       .attr('class', 'highlight-atom')
       .attr('r', r)
       .attr('x', -r / 2)

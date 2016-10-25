@@ -12,7 +12,7 @@ var distance = function (x1, y1, x2, y2) {
 };
 
 module.exports = function () {
-  var bond, atoms, g_el, _length, no_symbols, x, y;
+  var bond, atoms, _length, no_symbols, x, y;
 
   function _render(graph) {
     var a1 = atoms[bond.a1],
@@ -109,7 +109,7 @@ module.exports = function () {
       .attr('stroke', 'black');
   }
   function draw_single_plain(graph, x1, x2, y1, y2) {
-    xyData = [
+    var xyData = [
       [x1, y1],
       [x2, y2]
     ];
@@ -136,7 +136,7 @@ module.exports = function () {
       .attr('d', wedgeBond(xyData));
   }
   function draw_single_hash(graph, x1, x2, y1, y2, l){
-    console.log("hash", x1, x2, y1, y2, l);
+    console.log('hash', x1, x2, y1, y2, l);
     var off, // offset factor for stereo bonds
         xOff, // total offset in x
         yOff, // total offset in y
@@ -154,7 +154,7 @@ module.exports = function () {
         [x1 + dxx1 * j, y1 + dyy1 * j], [x1 + dxx2 * j, y1 + dyy2 * j]
       );
     }
-    console.log("hashxy", xyData.map(function(e){return e[0];}));
+    console.log('hashxy', xyData.map(function(e){return e[0];}));
     graph.append('svg:path')
       .style('fill', 'none')
       .style('stroke-width', 1)
@@ -234,39 +234,40 @@ module.exports = function () {
     y1 = y(y1);
     y2 = y(y2);
     
-    graph.insert("line")
-      .attr("class", "highlight-bond")
-      .attr("x1", x1)
-      .attr("y1", y1)
-      .attr("x2", x2)
-      .attr("y2", y2)
-      //.style("stroke", "#a8d1ff")
-    .style("stroke-width", Math.max(l/3, 10) + "px");
-      //.style("stroke-opacity", "0.0")
+    graph.insert('line')
+      .datum(bond)
+      .attr('class', 'highlight-bond')
+      .attr('x1', x1)
+      .attr('y1', y1)
+      .attr('x2', x2)
+      .attr('y2', y2)
+      //.style('stroke', '#a8d1ff')
+    .style('stroke-width', Math.max(l/3, 10) + 'px');
+      //.style('stroke-opacity', '0.0')
       //.attr('stroke-linecap', 'round')
       //.attr('stroke-linejoin', 'round');
-  }
-/**
- * d3 line function using the SVG path mini language to draw a plain bond.
- */
-var plainBond = d3.svg.line()
-  .interpolate(function (points) {
-    var path = points[0][0] + ',' + points[0][1];
-    for (var i = 1; i < points.length; i++) {
-      if (i % 2 === 0) {
-        path += 'M' + points[i][0] + ',' + points[i][1];
-      } else {
-        path += 'L' + points[i][0] + ',' + points[i][1];
+z  }
+  /**
+   * d3 line function using the SVG path mini language to draw a plain bond.
+   */
+  var plainBond = d3.svg.line()
+    .interpolate(function (points) {
+      var path = points[0][0] + ',' + points[0][1];
+      for (var i = 1; i < points.length; i++) {
+        if (i % 2 === 0) {
+          path += 'M' + points[i][0] + ',' + points[i][1];
+        } else {
+          path += 'L' + points[i][0] + ',' + points[i][1];
+        }
       }
-    }
-    return path;
-  })
-  .x(function (d) {
-    return x(d[0]);
-  })
-  .y(function (d) {
-    return y(d[1]);
-  });
+      return path;
+    })
+    .x(function (d) {
+      return x(d[0]);
+    })
+    .y(function (d) {
+      return y(d[1]);
+    });
 
   /**
    * d3 line function using the SVG path mini language to draw a wedge bond.

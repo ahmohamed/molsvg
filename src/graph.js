@@ -9,7 +9,7 @@
  */
 module.exports = function () {
   var atoms, x, y, graph_el, no_margins;
-  var w = 200, h = 200;
+  var w = 500, h = 500;
   
   function graph(el) {
     // x minimum and maximum
