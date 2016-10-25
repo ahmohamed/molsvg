@@ -13,7 +13,6 @@ module.exports = function () {
     x = graph.x();
     y = graph.y();
     
-    
     /****** Bonds ******/
     draw_bond = draw_bond.atoms(atoms)
       .x(x).y(y);

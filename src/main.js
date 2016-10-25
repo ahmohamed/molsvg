@@ -69,6 +69,8 @@ module.exports = function () {
   /******** State control ***************/
   _main.hightlightAtom = events.hightlightAtom;
   _main.hightlightBond = events.hightlightBond;
+  _main.selectAtom = events.selectAtom;
+  _main.selectBond = events.selectBond;
   _main.getSelectedAtoms = events.getSelectedAtoms;
   _main.getHighlightedAtoms = events.getHighlightedAtoms;
   _main.getSelectedBonds = events.getSelectedBonds;

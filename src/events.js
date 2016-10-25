@@ -2,21 +2,21 @@ module.exports = function () {
   var atoms, bonds;
   var _highlight_atoms = true, _highlight_bonds = true, _select;
   var rendered;
-  var highligh_atom = function (atom_idx) {
+  var highligh_atom = function (atom_idx, unhighlight) {
     if (atom_idx.constructor !== Array){
       atom_idx = [atom_idx];
     }
     rendered.selectAll('.highlight-atom')
       .filter(function(d){ return atom_idx.indexOf(d.idx) > -1; })
-      .classed('highlighted', true);
+      .classed('highlighted', !unhighlight);
   };
-  var highligh_bond = function (bond_idx) {
+  var highligh_bond = function (bond_idx, unhighlight) {
     if (bond_idx.constructor !== Array){
       bond_idx = [bond_idx];
     }
     rendered.selectAll('.highlight-bond')
       .filter(function(d){ return bond_idx.indexOf(d.idx) > -1; })
-      .classed('highlighted', true);
+      .classed('highlighted', !unhighlight);
   };
   var enable_atoms_highlight = function (graph_el, symbols, adjacent) {
     graph_el.selectAll('.highlight-atom').on('mouseenter', function () {
@@ -220,13 +220,33 @@ module.exports = function () {
   /**************************************/
   
   /******** State control ***************/
-  _events.hightlightAtom = function(atom_idx){
+  _events.hightlightAtom = function(atom_idx, unhighlight){
     if (!rendered){ return; }
-    highligh_atom(atom_idx);
+    highligh_atom(atom_idx, unhighlight);
   };
-  _events.hightlightBond = function(bond_idx){
+  _events.hightlightBond = function(bond_idx, unhighlight){
     if (!rendered){ return; }
-    highligh_bond(bond_idx);
+    highligh_bond(bond_idx, unhighlight);
+  };
+  _events.selectAtom = function(atom_idx, deselect){
+    if (!rendered){ return; }
+    if (atom_idx.constructor !== Array){
+      atom_idx = [atom_idx];
+    }
+    
+    rendered.selectAll('.highlight-atom')
+      .filter(function(d){ return atom_idx.indexOf(d.idx) > -1; })
+      .classed('selected', !deselect);
+  };
+  _events.selectBond = function(bond_idx, deselect){
+    if (!rendered){ return; }
+    if (bond_idx.constructor !== Array){
+      bond_idx = [bond_idx];
+    }
+    rendered.selectAll('.highlight-bond')
+      .filter(function(d){ return bond_idx.indexOf(d.idx) > -1; })
+      .classed('selected', !deselect);
+    
   };
   _events.getSelectedAtoms = function (symbols) {
     if (!rendered){ return; }
