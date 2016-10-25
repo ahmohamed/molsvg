@@ -20,66 +20,28 @@
  * modified and improved by Ahmed Mohamed <mohamed@kuicr.kyoto-u.ac.jp>
 */
 module.exports = function () {
-  var molfile, x, y, filtered_atoms = [], organic, implicit_h;
-  var _highlight = true;
+  var molfile;
   
-  var graph = require('./graph')();
-  var draw_atom = require('./atom')();
-  var draw_bond = require('./bond')();
+  var renderer = require('./renderer')();
+  var events = require('./events')();
   
   function _main(el) {
     if (molfile === undefined) {
       console.error('No Mol file provided.');
     }
-    //el = this;
     
-    parsed_mol = require('./parser')(molfile);
+    var parsed_mol = require('./parser')(molfile);
     var atoms = parsed_mol[0],
       bonds = parsed_mol[1];
     
-    //bonds = filter_bonds(bonds, atoms);
-    el.call(graph.atoms(atoms));                  // layout SVG
+    el.call(
+      renderer.atoms(atoms).bonds(bonds)
+    );                  // Render molecule.
+        
     
-    
-    x = graph.x();
-    y = graph.y();
-    
-    //drawBonds(atoms, bonds, graph.el());
-    draw_bond = draw_bond.atoms(atoms)
-      .x(x).y(y);
-    
-    var bondL = [];
-    bonds.filter(function (b) {
-      return filtered_atoms.indexOf( atoms[b.a1].symbol ) < 0 &&
-        filtered_atoms.indexOf( atoms[b.a2].symbol ) < 0;
-    }).forEach(function (b) {
-      graph.el()    
-        .call(draw_bond.bond(b));
-      
-      bondL.push(draw_bond.bondLength());
-    });
-    var avgBondL = average(bondL);
-    if (!draw_bond.noSymbols()){avgBondL *= 0.8;}
-    
-    draw_atom = draw_atom.bondLength(avgBondL)
-      .x(x).y(y);
-    
-    atoms.filter(function (a) {
-      return filtered_atoms.indexOf(a.symbol) < 0;
-    })
-    .forEach(function (a) {
-      graph.el()
-        .call(
-          draw_atom.atom(a)
-            .hidden(organic && a.symbol === 'C')
-        );
-    });
-    
-    
-    if (_highlight) {
-      enable_highlight(graph.el());
-    }
-    
+    el.call(
+      events.atoms(atoms).bonds(bonds)
+    );
   }
   // Input File
   _main.molfile = function (_) {
@@ -92,87 +54,31 @@ module.exports = function () {
   };
   
   /******** Rendering config ************/
-  _main.implicitH = function (_) {
-    if (!arguments.length) {
-      return implicit_h;
-    }
-    if (_) {
-      filtered_atoms.push('H');
-    }else{
-      filtered_atoms = filtered_atoms.filter(function(a){return a !== 'H';});
-    }
-    
-    implicit_h = _;
-    
-    return _main;
-  };
-  _main.noSymbols = function (_) {
-    if (!arguments.length) {
-      return draw_atom.noSymbols();
-    }
-    draw_atom = draw_atom.noSymbols(_);
-    draw_bond = draw_bond.noSymbols(_);
-    
-    return _main;
-  };  
-  _main.organic = function (_) {
-    if (!arguments.length) {
-      return organic;
-    }
-    if (_){
-      draw_atom = draw_atom.noSymbols(_);
-      draw_bond = draw_bond.noSymbols(_);
-      _main.implicitH(_);
-    }
-    organic = _;
-    
-    return _main;
-  };
+  _main.implicitH = functor(renderer.implicitH);
+  _main.noSymbols = functor(renderer.noSymbols);  
+  _main.organic = functor(renderer.organic);
   /**************************************/
+  
   /******** User interaction ************/
-  _main.highlightEnable = function (_) {
-    if (!arguments.length) {
-      return _highlight;
-    }
-    if (_ && graph.el()){ // molecule is rendered.
-      enable_highlight(graph.el());      
-    }
-    _highlight = _;
-    
-    return _main;
-  };
-  
+  _main.highlightAtomsEnable = functor(events.highlightAtomsEnable);
+  _main.highlightBondsEnable = functor(events.highlightBondsEnable);
+  _main.highlightEnable = functor(events.highlightEnable);
+  _main.selectEnable = functor(events.selectEnable);
   /**************************************/
+  
   /******** SVG attributes **************/  
-  _main.width = graph.width;
-  _main.height = graph.height;
+  _main.width = functor(renderer.width);
+  _main.height = functor(renderer.height);
   
+  
+  function functor(f){
+    return function () {
+      if (!arguments.length) {
+        return f();
+      }
+      f.apply(this, arguments);
+      return _main;
+    };
+  }
   return _main;
-  
-  function bond_filter(b) {
-    return filtered_atoms.indexOf(b.a1.symbol) < 0 &&
-      filtered_atoms.indexOf(b.a2.symbol) < 0;
-  }
-};
-
-var average = function(arr){
-  var sum = 0;
-  for (var i = 0; i < arr.length; i++) {
-    sum += arr[i];
-  }
-  return sum / arr.length;
-};
-
-var enable_highlight = function (graph_el) {
-  graph_el.selectAll('.highlight-bond').on('mouseenter', function () {
-    d3.select(this).classed("highlighted", true);
-  }).on('mouseleave', function () {
-    d3.select(this).classed("highlighted", false);
-  });
-  
-  graph_el.selectAll('.highlight-atom').on('mouseenter', function () {
-    d3.select(this).classed("highlighted", true);
-  }).on('mouseleave', function () {
-    d3.select(this).classed("highlighted", false);
-  });
 };
