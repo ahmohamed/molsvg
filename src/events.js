@@ -2,7 +2,22 @@ module.exports = function () {
   var atoms, bonds;
   var _highlight_atoms = true, _highlight_bonds = true, _select;
   var rendered;
-  
+  var highligh_atom = function (atom_idx) {
+    if (atom_idx.constructor !== Array){
+      atom_idx = [atom_idx];
+    }
+    rendered.selectAll('.highlight-atom')
+      .filter(function(d){ return atom_idx.indexOf(d.idx) > -1; })
+      .classed('highlighted', true);
+  };
+  var highligh_bond = function (bond_idx) {
+    if (bond_idx.constructor !== Array){
+      bond_idx = [bond_idx];
+    }
+    rendered.selectAll('.highlight-bond')
+      .filter(function(d){ return bond_idx.indexOf(d.idx) > -1; })
+      .classed('highlighted', true);
+  };
   var enable_atoms_highlight = function (graph_el, symbols, adjacent) {
     graph_el.selectAll('.highlight-atom').on('mouseenter', function () {
       if (symbols && symbols.constructor !== Array){
@@ -21,16 +36,13 @@ module.exports = function () {
             return symbols.indexOf( adj_a.symbol) > -1;
           }).map(function(adj_a){return adj_a.idx;});
           
-          if (adjacent_atoms.length > 0){
-            graph_el.selectAll('.highlight-atom')
-              .filter(function(d){ return adjacent_atoms.indexOf(d.idx) > -1; })
-              .classed('highlighted', true);
-            
+          if (adjacent_atoms.length > 0){          
             d3.select(this).classed('highlighted', true);
+            highligh_atom(adjacent_atoms);
           }
         }
       
-        return; 
+        return;
       }
       d3.select(this).classed('highlighted', true);
     }).on('mouseleave', function () {
@@ -90,7 +102,6 @@ module.exports = function () {
       if (_highlight_atoms.symbols) {
         $els = $els.filter(function(d){ return _highlight_atoms.symbols.indexOf(d.symbol) > -1;});
       }
-        
       
       if ($els.size() > 0){
         $els.classed('selected', !$els.classed('selected') );
@@ -201,5 +212,15 @@ module.exports = function () {
     return _events;
   };
   /**************************************/
+  
+  /******** State control ************/
+  _events.hightlightAtom = function(atom_idx){
+    if (!rendered){ return; }
+    highligh_atom(atom_idx);
+  };
+  _events.hightlightBond = function(bond_idx){
+    if (!rendered){ return; }
+    highligh_bond(bond_idx);
+  };
   return _events;
 };
