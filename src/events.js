@@ -235,7 +235,7 @@ module.exports = function () {
       symbols = [symbols];
     }
     if (symbols) {
-      out.filter(function (a) { return symbols.indexOf(a.symbol) > -1;});
+      out = out.filter(function (a) { return symbols.indexOf(a.symbol) > -1;});
     }
     return out;
   };
@@ -246,7 +246,7 @@ module.exports = function () {
       symbols = [symbols];
     }
     if (symbols) {
-      out.filter(function (a) { return symbols.indexOf(a.symbol) > -1;});
+      out = out.filter(function (a) { return symbols.indexOf(a.symbol) > -1;});
     }
     return out;
   };
