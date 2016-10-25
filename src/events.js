@@ -52,7 +52,10 @@ module.exports = function () {
     
       // Check if the bond order and stereo matches.
       if ( order && order.indexOf(b.order) < 0){ return; }
-      if ( stereo && stereo.indexOf( stereo2str[b.stereo] ) < 0){ return; }
+      if ( b.order === 1 &&               // Stereo is only considered in single bonds.
+        stereo && stereo.indexOf( stereo2str[b.stereo] ) < 0){
+        return; 
+      }
     
       d3.select(this).classed('highlighted', true);
     }).on('mouseleave', function () {
@@ -60,9 +63,16 @@ module.exports = function () {
     });
   };
   var enable_select = function (graph_el, multiple) {
-    console.log('select enabled', graph_el.selectAll('.highlight-atom.highlighted'));
     graph_el.selectAll('.highlight-bond').on('click', function () {
       var $this = d3.select(this);
+      if (!$this.classed('highlighted')) {
+        return;
+      }
+      if (!multiple) {
+        graph_el.selectAll('.highlight-bond.selected:not(.highlighted)')
+          .classed('selected', false);
+      }
+      
       $this.classed('selected', !$this.classed('selected') );
     });
   
@@ -71,7 +81,6 @@ module.exports = function () {
         return;
       }
       if (!multiple) {
-        console.log('not multiple', multiple);
         graph_el.selectAll('.highlight-atom.selected:not(.highlighted)')
           .classed('selected', false);
       }
