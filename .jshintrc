@@ -5,7 +5,10 @@
   "quotmark": "single",
   "regexp": true,
   "trailing": true,
-  
+  "undef": true,
+  "unused": true,
+
+  "node":true,
   "browser": true,
   "globals": {
      "d3": false
