@@ -22,9 +22,11 @@ module.exports = function () {
           }).map(function(adj_a){return adj_a.idx;});
           
           if (adjacent_atoms.length > 0){
-            var filtered = graph_el.selectAll('.highlight-atom')
+            graph_el.selectAll('.highlight-atom')
               .filter(function(d){ return adjacent_atoms.indexOf(d.idx) > -1; })
               .classed('highlighted', true);
+            
+            d3.select(this).classed('highlighted', true);
           }
         }
       
@@ -57,15 +59,44 @@ module.exports = function () {
       d3.select(this).classed('highlighted', false);
     });
   };
-  var enable_select = function (graph_el) {
+  var enable_select = function (graph_el, multiple) {
+    console.log('select enabled', graph_el.selectAll('.highlight-atom.highlighted'));
     graph_el.selectAll('.highlight-bond').on('click', function () {
       var $this = d3.select(this);
       $this.classed('selected', !$this.classed('selected') );
     });
   
     graph_el.selectAll('.highlight-atom').on('click', function () {
-      var $this = d3.select(this);
-      $this.classed('selected', !$this.classed('selected') );
+      if (!d3.select(this).classed('highlighted')) {
+        return;
+      }
+      if (!multiple) {
+        console.log('not multiple', multiple);
+        graph_el.selectAll('.highlight-atom.selected:not(.highlighted)')
+          .classed('selected', false);
+      }
+      
+      var $els = graph_el.selectAll('.highlight-atom.highlighted');
+      
+      if (_highlight_atoms.symbols) {
+        $els = $els.filter(function(d){ return _highlight_atoms.symbols.indexOf(d.symbol) > -1;});
+      }
+        
+      
+      if ($els.size() > 0){
+        $els.classed('selected', !$els.classed('selected') );
+      } else {
+        // If the clicked atom is highlighted.
+        // This indicates that the atom is either a selectable atom (includes in highlight symbols)
+        // or adjancent to selectable atoms. The first case is staightforward, and the clicked atom
+        // will be selected. In the second case, the adjacent atoms (with the target symbols) are highlighted.
+        // Therefore, will be retained in $els.filter().
+        // If there are not any retained atoms, it means that the adjacent atoms are implicit (Hydrogens).
+        // In this case, select the clicked atom instead. 
+        var $this = d3.select(this);
+        $this.classed('selected', !$this.classed('selected') );
+      }
+      
     });
   };
   var get_adjacent_atoms = function (a) {
@@ -85,7 +116,7 @@ module.exports = function () {
       enable_bonds_highlight(el, _highlight_bonds.order, _highlight_bonds.stereo);
     }
     if (_select) {
-      enable_select(el);
+      enable_select(el, _select.multiple);
     }
     
     rendered = el;
@@ -146,14 +177,18 @@ module.exports = function () {
     _events.highlightBondsEnable(enable);
     return _events;
   };
-  _events.selectEnable = function (enable) {
+  _events.selectEnable = function (enable, multiple) {
     if (!arguments.length) {
       return _select;
     }
-    if (enable && rendered){
-      enable_select(rendered);
-    }
-    _select = enable; 
+    if (enable){
+      _select = {multiple:multiple};
+      if (rendered) {
+        enable_select(rendered, multiple);
+      }      
+    }else {
+      _select = enable; 
+    }    
     return _events;
   };
   /**************************************/
