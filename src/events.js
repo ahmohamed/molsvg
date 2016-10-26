@@ -2,6 +2,7 @@ module.exports = function () {
   var atoms, bonds;
   var _highlight_atoms = true, _highlight_bonds = true, _select;
   var rendered;
+  
   var highligh_atom = function (atom_idx, unhighlight) {
     if (atom_idx.constructor !== Array){
       atom_idx = [atom_idx];
@@ -255,6 +256,14 @@ module.exports = function () {
       symbols = [symbols];
     }
     if (symbols) {
+      if (_highlight_atoms.adjacent) {
+        var not_symbol = out.filter(function (a) { return symbols.indexOf(a.symbol) < 0;});
+        var adj_a = not_symbol.map(function(a){
+          return get_adjacent_atoms(a, symbols).map(function(a_idx){return atoms[a_idx];});
+        });
+        
+        out = [].concat.apply(out, adj_a);
+      }
       out = out.filter(function (a) { return symbols.indexOf(a.symbol) > -1;});
     }
     return out;

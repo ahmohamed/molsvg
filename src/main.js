@@ -74,6 +74,7 @@ module.exports = function () {
   _main.getSelectedAtoms = events.getSelectedAtoms;
   _main.getHighlightedAtoms = events.getHighlightedAtoms;
   _main.getSelectedBonds = events.getSelectedBonds;
+  _main.getHighlightedBonds = events.getHighlightedBonds;
   /**************************************/
   
   /******** SVG attributes **************/  
